@@ -1,0 +1,10 @@
+[Unit]
+Description=Timer for IBLUPS SRS Ingest Monitor
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+Unit=srs-monitor.service
+
+[Install]
+WantedBy=timers.target

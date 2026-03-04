@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  srs-thumbnail:
+    image: ossrs/srs:6
+    container_name: iblups-srs-thumbnail
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - ./srs-thumb.conf:/usr/local/srs/conf/srs.conf:ro
+      - srs-data:/usr/local/srs/objs/nginx/html
+    # Limitando recursos al 80%
+    deploy:
+      resources:
+        limits:
+          cpus: '10.0'
+          memory: 10G
+
+  nginx-thumbnail-edge:
+    image: nginx:alpine
+    container_name: iblups-thumbnail-nginx
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      # Montamos la carpeta compartida donde SRS sobrescribe las imágenes PNG
+      - srs-data:/usr/local/srs/objs/nginx/html:ro
+    depends_on:
+      - srs-thumbnail
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 2G
+
+volumes:
+  srs-data:

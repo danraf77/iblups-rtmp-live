@@ -1,0 +1,11 @@
+[Unit]
+Description=IBLUPS SRS HLS Monitor
+After=network.target docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/iblups-live/srs-hls/srs-monitor.sh
+User=root
+
+[Install]
+WantedBy=multi-user.target

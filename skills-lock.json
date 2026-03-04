@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "cloudflare": {
+      "source": "cloudflare/skills",
+      "sourceType": "github",
+      "computedHash": "02ef72b4906d295d03da15d52357babdef06a762f0374b85c89c73c9b22a7bad"
+    },
+    "golang-expert-skill": {
+      "source": "danraf77/golang-expert-skill",
+      "sourceType": "github",
+      "computedHash": "320b6225c2266cdd54dcb9af3a8eb3a34ca5351fa7c37ffa7b57c54bfecbea7e"
+    },
+    "srs6-skill": {
+      "source": "danraf77/srs6-skill",
+      "sourceType": "github",
+      "computedHash": "fe4d8bce0a9bb303eb0c7e1f572a8c404b82b00ba3485f50624fbb91bd2ceae9"
+    }
+  }
+}

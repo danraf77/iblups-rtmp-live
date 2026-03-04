@@ -1,0 +1,23 @@
+# Entornos y Secretos
+.env
+.env.*
+!.env.example
+
+# Binarios de Go
+backend-go/iblups-ingest
+
+# Archivos de SRS y Sistema
+/objs/
+*.log
+*.pid
+/tmp/
+
+# Archivos generados por el Editor / OS
+.DS_Store
+.vscode/
+.idea/
+/txt
+.agents
+.skills-lock.json
+.venv_pdf
+

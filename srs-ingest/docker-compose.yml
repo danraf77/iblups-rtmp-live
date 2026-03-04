@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  srs-ingest:
+    image: ossrs/srs:6
+    container_name: srs-ingest
+    network_mode: "host"
+    restart: always
+    volumes:
+      - ./srs-ingest.conf:/usr/local/srs/conf/ingest.conf
+    command: ./objs/srs -c conf/ingest.conf
+    deploy:
+      resources:
+        limits:
+          cpus: '12'
+          memory: 12G
+
+  backend-go:
+    build: ./backend-go
+    container_name: backend-go
+    network_mode: "host"
+    restart: always
+    env_file:
+      - .env
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G

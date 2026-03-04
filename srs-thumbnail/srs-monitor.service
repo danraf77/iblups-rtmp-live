@@ -1,0 +1,11 @@
+[Unit]
+Description=IBLUPS SRS Thumbnail Monitor
+After=network.target docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/iblups-live/srs-thumbnail/srs-monitor.sh
+User=root
+
+[Install]
+WantedBy=multi-user.target
