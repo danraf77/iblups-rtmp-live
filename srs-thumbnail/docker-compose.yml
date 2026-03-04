@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   srs-thumbnail:
-    image: ossrs/srs:6
+    build: .
     container_name: iblups-srs-thumbnail
     restart: unless-stopped
     network_mode: "host"
