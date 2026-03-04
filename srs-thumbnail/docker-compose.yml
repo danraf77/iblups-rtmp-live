@@ -10,8 +10,17 @@ services:
     volumes:
       - ./srs-thumb.conf:/usr/local/srs/conf/srs.conf:ro
       - srs-data:/usr/local/srs/objs/nginx/html
-    cpus: '10.0'
-    mem_limit: 10g
+    healthcheck:
+      test: [ "CMD", "curl", "-s", "-f", "http://127.0.0.1:1985/api/v1/versions" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '10.0'
+          memory: 10g
 
   nginx-thumbnail-edge:
     image: nginx:alpine
@@ -23,9 +32,13 @@ services:
       # Carpeta compartida donde SRS escribe los thumbnails JPG
       - srs-data:/usr/local/srs/objs/nginx/html:ro
     depends_on:
-      - srs-thumbnail
-    cpus: '4.0'
-    mem_limit: 2g
+      srs-thumbnail:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 2g
 
 volumes:
   srs-data:
