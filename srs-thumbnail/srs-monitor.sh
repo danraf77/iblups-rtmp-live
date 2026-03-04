@@ -27,8 +27,8 @@ send_email() {
          -H "Authorization: Bearer $RESEND_API_KEY" \
          -H "Content-Type: application/json" \
          -d "{
-               \"from\": \"alertas@iblups.com\",
-               \"to\": [\"$ALERT_EMAIL\"],
+               \"from\": \"$RESEND_FROM\",
+               \"to\": [\"$RESEND_TO\"],
                \"subject\": \"$subject\",
                \"text\": \"$message\"
              }"
