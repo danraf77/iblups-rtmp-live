@@ -18,6 +18,6 @@ backend-go/iblups-ingest
 .idea/
 /txt
 .agents
-.skills-lock.json
+skills-lock.json
 .venv_pdf
 
