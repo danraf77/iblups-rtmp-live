@@ -2,13 +2,20 @@ version: '3.8'
 
 services:
   srs-hls:
-    image: ossrs/srs:6
+    build: .
     container_name: iblups-srs-hls
     restart: unless-stopped
     network_mode: "host"
+    command: ./objs/srs -c conf/srs.conf
     volumes:
       - ./srs-hls.conf:/usr/local/srs/conf/srs.conf:ro
       - srs-data:/usr/local/srs/objs/nginx/html
+    healthcheck:
+      test: [ "CMD", "curl", "-s", "-f", "http://127.0.0.1:1985/api/v1/versions" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
     # Limitando recursos al 80% de los 16 GB RAM y 16 Cores por seguridad del OS
     deploy:
       resources:
@@ -26,7 +33,8 @@ services:
       # Montamos la carpeta compartida donde SRS deposita el HLS (.m3u8 y .ts)
       - srs-data:/usr/local/srs/objs/nginx/html:ro
     depends_on:
-      - srs-hls
+      iblups-srs-hls:
+        condition: service_healthy
     deploy:
       resources:
         limits:

@@ -4,6 +4,7 @@ After=network.target docker.service
 
 [Service]
 Type=oneshot
+RemainAfterExit=no
 ExecStart=/opt/iblups-live/srs-hls/srs-monitor.sh
 User=root
 

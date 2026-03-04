@@ -5,6 +5,7 @@ Requires=docker.service
 
 [Service]
 Type=oneshot
+RemainAfterExit=no
 ExecStart=/bin/bash /opt/srs-ingest/srs-monitor.sh
 # Requires changing path if placed elsewhere
 
