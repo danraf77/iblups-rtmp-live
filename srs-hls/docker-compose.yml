@@ -4,8 +4,7 @@ services:
     container_name: iblups-srs-hls
     restart: unless-stopped
     network_mode: "host"
-    # Rutas absolutas + limpieza de pid huérfano en cada arranque
-    command: >
+    entrypoint: >
       sh -c "rm -f /usr/local/srs/objs/srs.pid &&
              exec /usr/local/srs/objs/srs -c /usr/local/srs/conf/srs.conf"
     volumes:
