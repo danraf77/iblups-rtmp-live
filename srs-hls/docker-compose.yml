@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   srs-hls:
     build: .
@@ -33,7 +31,7 @@ services:
       # Montamos la carpeta compartida donde SRS deposita el HLS (.m3u8 y .ts)
       - srs-data:/usr/local/srs/objs/nginx/html:ro
     depends_on:
-      iblups-srs-hls:
+      srs-hls:
         condition: service_healthy
     deploy:
       resources:
