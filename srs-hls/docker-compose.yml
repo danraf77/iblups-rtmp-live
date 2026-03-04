@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
     network_mode: "host"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - srs-data:/usr/local/srs/objs/nginx/html:ro
     depends_on:
       srs-hls:
