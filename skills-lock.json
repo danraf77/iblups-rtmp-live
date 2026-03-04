@@ -6,6 +6,11 @@
       "sourceType": "github",
       "computedHash": "02ef72b4906d295d03da15d52357babdef06a762f0374b85c89c73c9b22a7bad"
     },
+    "docker-expert": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "76bd52d934142cb8f3861cb37f2a39ad93bf3b03dcbc94a02beaa0544f6dd7c2"
+    },
     "ffmpeg": {
       "source": "digitalsamba/claude-code-video-toolkit",
       "sourceType": "github",
