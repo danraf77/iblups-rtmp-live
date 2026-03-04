@@ -120,3 +120,26 @@ sudo systemctl status srs-monitor.timer
 
 ### ✅ ¡Tú sistema ahora está desplegado e Inmune a reinicios!
 *(El VPS arrancará la red automáticamente y monitoreará el flujo por ti de por vida).*
+
+---
+
+## 🔄 Fase 4: ¿Cómo actualizar el código en el futuro?
+
+Cuando hagas cambios en el repositorio de GitHub (ej. editar un conf, arreglar un script de Go) y necesites aplicarlos en el VPS que ya está corriendo en producción, simplemente sigue este proceso sin asustarte.
+
+1. Entra a la carpeta raíz del proyecto y trae los cambios:
+```bash
+cd /opt/iblups-rtmp-live
+# O usa la ruta donde lo hayas clonado
+git pull origin main
+```
+
+2. Entra a la carpeta del nodo específico que cambiaste (por ejemplo, el de Ingesta) y reinicia su contenedor Docker para que absorba la nueva configuración:
+```bash
+cd srs-ingest
+
+# Detiene el stack, lo reconstruye (vital si tocaste Go), y lo levanta
+docker compose down
+docker compose up -d --build
+```
+*(Repite el paso 2 entrando a `srs-hls` o `srs-thumbnail` si los cambios afectaban a esos nodos).*
