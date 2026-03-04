@@ -10,11 +10,8 @@ services:
       - ./srs-thumb.conf:/usr/local/srs/conf/srs.conf:ro
       - srs-data:/usr/local/srs/objs/nginx/html
     # Limitando recursos al 80%
-    deploy:
-      resources:
-        limits:
-          cpus: '10.0'
-          memory: 10G
+    cpus: '10.0'
+    mem_limit: 10g
 
   nginx-thumbnail-edge:
     image: nginx:alpine
@@ -27,11 +24,8 @@ services:
       - srs-data:/usr/local/srs/objs/nginx/html:ro
     depends_on:
       - srs-thumbnail
-    deploy:
-      resources:
-        limits:
-          cpus: '4.0'
-          memory: 2G
+    cpus: '4.0'
+    mem_limit: 2g
 
 volumes:
   srs-data:

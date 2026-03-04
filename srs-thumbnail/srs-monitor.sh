@@ -11,7 +11,7 @@ check_health() {
     if ! docker ps | grep -q 'iblups-srs-thumbnail'; then return 1; fi
     
     # 2. Ports Open (8080 HTTP and 1935 RTMP)
-    if ! netstat -tuln | grep -q :8080; then return 1; fi
+    if ! netstat -tuln | grep -q :80; then return 1; fi
     if ! netstat -tuln | grep -q :1935; then return 1; fi
     
     # 3. HTTP 200 on SRS API
