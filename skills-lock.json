@@ -6,6 +6,11 @@
       "sourceType": "github",
       "computedHash": "02ef72b4906d295d03da15d52357babdef06a762f0374b85c89c73c9b22a7bad"
     },
+    "ffmpeg": {
+      "source": "digitalsamba/claude-code-video-toolkit",
+      "sourceType": "github",
+      "computedHash": "51fa05bc18bb2691e622aefd1d8ec6d4d96a9e9c44cdf599003c9d6003d11a07"
+    },
     "golang-expert-skill": {
       "source": "danraf77/golang-expert-skill",
       "sourceType": "github",
