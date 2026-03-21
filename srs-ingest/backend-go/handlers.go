@@ -34,6 +34,17 @@ func HandleOnPublish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	banned, err := IsIPBanned(req.Ip)
+	if err != nil {
+		log.Printf("on_publish: failed to check ban for %s: %v", req.Ip, err)
+	}
+	if banned {
+		log.Printf("on_publish: rejected banned IP %s (stream: %s)", req.Ip, req.Stream)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"code": 1, "data": "ip banned"}`))
+		return
+	}
+
 	hlsToken, thumbToken, err := activateStream(req.Stream)
 	if err != nil {
 		log.Printf("on_publish rejected for %s: %v", req.Stream, err)
@@ -80,6 +91,66 @@ func HandleListStreams(w http.ResponseWriter, r *http.Request) {
 func HandleGetTokens(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"status": "ok", "tokens": {}}`))
+}
+
+type KickoffRequest struct {
+	StreamID string `json:"stream_id"`
+	Reason   string `json:"reason"`
+}
+
+func HandleKickoff(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token := os.Getenv("INTERNAL_TOKEN")
+	if token == "" || r.Header.Get("X-Internal-Token") != token {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`{"error": "unauthorized"}`))
+		return
+	}
+
+	var req KickoffRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.StreamID == "" {
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	cid, err := FindPublisherCid(req.StreamID)
+	if err != nil {
+		log.Printf("kickoff: publisher not found for %s: %v", req.StreamID, err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"error": "stream not found or not active"}`))
+		return
+	}
+
+	clientIP, err := GetClientIP(cid)
+	if err != nil {
+		log.Printf("kickoff: failed to get IP for cid %s: %v", cid, err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error": "failed to get client IP"}`))
+		return
+	}
+
+	if err := BanIP(clientIP, req.Reason); err != nil {
+		log.Printf("kickoff: failed to ban IP %s: %v", clientIP, err)
+	}
+
+	if err := KickoffClient(cid); err != nil {
+		log.Printf("kickoff: failed to kick cid %s: %v", cid, err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error": "failed to kickoff client"}`))
+		return
+	}
+
+	log.Printf("kickoff: stream %s (cid %s, ip %s) kicked and banned", req.StreamID, cid, clientIP)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"ok": true}`))
 }
 
 func HandleOnForward(w http.ResponseWriter, r *http.Request) {

@@ -15,6 +15,7 @@ func main() {
 		"SUPABASE_SERVICE_KEY",
 		"SRS_HLS_URL",
 		"SRS_THUMBNAIL_URL",
+		"INTERNAL_TOKEN",
 	}
 
 	for _, v := range requiredVars {
@@ -34,6 +35,7 @@ func main() {
 	// Register Internal Dashboard API handlers
 	http.HandleFunc("/api/streams", HandleListStreams)
 	http.HandleFunc("/api/streams/token", HandleGetTokens)
+	http.HandleFunc("/api/kickoff", HandleKickoff)
 
 	port := os.Getenv("PORT")
 	if port == "" {

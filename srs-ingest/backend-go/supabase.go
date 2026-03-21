@@ -94,6 +94,31 @@ func UpdateLiveStatus(streamKey string, isLive bool) error {
 	return err
 }
 
+func BanIP(ip, reason string) error {
+	endpoint := "/rest/v1/rtmp_banned_ips"
+	payload := map[string]string{
+		"ip":     ip,
+		"reason": reason,
+	}
+	body, _ := json.Marshal(payload)
+	_, err := doRequest("POST", endpoint, body)
+	return err
+}
+
+func IsIPBanned(ip string) (bool, error) {
+	endpoint := fmt.Sprintf("/rest/v1/rtmp_banned_ips?ip=eq.%s&select=id", ip)
+	resp, err := doRequest("GET", endpoint, nil)
+	if err != nil {
+		return false, err
+	}
+
+	var rows []struct{}
+	if err := json.Unmarshal(resp, &rows); err != nil {
+		return false, err
+	}
+	return len(rows) > 0, nil
+}
+
 func LogPublishSession(streamKey, clientIP string) error {
 	endpoint := "/rest/v1/channel_publish_sessions"
 	payload := map[string]string{
