@@ -17,6 +17,7 @@ backend-go/iblups-ingest
 .vscode/
 .idea/
 /txt
+/srs-ingest/sql
 .agents
 skills-lock.json
 .venv_pdf

@@ -94,3 +94,14 @@ func UpdateLiveStatus(streamKey string, isLive bool) error {
 	return err
 }
 
+func LogPublishSession(streamKey, clientIP string) error {
+	endpoint := "/rest/v1/channel_publish_sessions"
+	payload := map[string]string{
+		"stream_id": streamKey,
+		"client_ip": clientIP,
+	}
+	body, _ := json.Marshal(payload)
+	_, err := doRequest("POST", endpoint, body)
+	return err
+}
+

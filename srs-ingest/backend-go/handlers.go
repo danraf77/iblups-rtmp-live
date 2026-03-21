@@ -45,7 +45,11 @@ func HandleOnPublish(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("on_publish approved for %s. HLS: %s, Thumb: %s", req.Stream, hlsToken, thumbToken)
-	
+
+	if err := LogPublishSession(req.Stream, req.Ip); err != nil {
+		log.Printf("on_publish: failed to log session for %s: %v", req.Stream, err)
+	}
+
 	// Retornar 0 le permite al cliente continuar publicando
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"code": 0, "data": "ok"}`))
