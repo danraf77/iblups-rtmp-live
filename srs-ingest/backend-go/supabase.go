@@ -5,16 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
 
 var (
-	sbURL    string
-	sbKey    string
-	serverID string
-	serverIP string
+	sbURL string
+	sbKey string
 )
 
 func InitSupabaseEnv(url, key string) {
@@ -97,18 +94,3 @@ func UpdateLiveStatus(streamKey string, isLive bool) error {
 	return err
 }
 
-func LogSystemEvent(eventType, severity, message string) {
-	endpoint := "/rest/v1/server_ingest_system_events"
-	payload := map[string]interface{}{
-		"server_id":  serverID,
-		"server_ip":  serverIP,
-		"event_type": eventType,
-		"severity":   severity,
-		"message":    message,
-	}
-	body, _ := json.Marshal(payload)
-	_, err := doRequest("POST", endpoint, body)
-	if err != nil {
-		log.Printf("Failed to log system event: %v", err)
-	}
-}

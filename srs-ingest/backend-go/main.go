@@ -26,12 +26,6 @@ func main() {
 	// Initialize Supabase client config
 	InitSupabaseEnv(os.Getenv("SUPABASE_URL"), os.Getenv("SUPABASE_SERVICE_KEY"))
 
-	// Pre-load Server ID and fetch initial state
-	InitServerInfo()
-
-	// Start metrics goroutine
-	go StartMetricsWorker()
-
 	// Register SRS webhooks handlers
 	http.HandleFunc("/api/on_publish", HandleOnPublish)
 	http.HandleFunc("/api/on_unpublish", HandleOnUnpublish)
