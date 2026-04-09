@@ -58,9 +58,11 @@ iptables -N ANTI_DDOS
 # Drop paquetes inválidos
 iptables -A ANTI_DDOS -m state --state INVALID -j DROP
 
-# SYN flood
-iptables -A ANTI_DDOS -p tcp --syn -m limit --limit 100/s --limit-burst 200 -j RETURN
-iptables -A ANTI_DDOS -p tcp --syn -j DROP
+# SYN flood por IP: máx 30 conexiones nuevas/seg por IP (un viewer normal usa ~1/seg)
+iptables -A ANTI_DDOS -p tcp --dport 80 --syn -m hashlimit --hashlimit-name syn80 \
+    --hashlimit-above 30/s --hashlimit-burst 50 --hashlimit-mode srcip --hashlimit-htable-expire 30000 -j DROP
+iptables -A ANTI_DDOS -p tcp --dport 443 --syn -m hashlimit --hashlimit-name syn443 \
+    --hashlimit-above 30/s --hashlimit-burst 50 --hashlimit-mode srcip --hashlimit-htable-expire 30000 -j DROP
 
 # ICMP flood
 iptables -A ANTI_DDOS -p icmp --icmp-type echo-request -m limit --limit 2/s --limit-burst 4 -j RETURN
