@@ -68,8 +68,8 @@ iptables -A ANTI_DDOS -p tcp --dport 443 --syn -m hashlimit --hashlimit-name syn
 iptables -A ANTI_DDOS -p icmp --icmp-type echo-request -m limit --limit 2/s --limit-burst 4 -j RETURN
 iptables -A ANTI_DDOS -p icmp --icmp-type echo-request -j DROP
 
-# RTMP: máx 5 conexiones por IP (solo publishers)
-iptables -A ANTI_DDOS -p tcp --dport 1935 -m connlimit --connlimit-above 5 -j DROP
+# RTMP: máx 50 conexiones por IP
+iptables -A ANTI_DDOS -p tcp --dport 1935 -m connlimit --connlimit-above 50 -j DROP
 
 # API SRS: solo localhost
 iptables -A ANTI_DDOS -p tcp --dport 1985 ! -s 127.0.0.1 -j DROP
