@@ -68,8 +68,14 @@ iptables -A ANTI_DDOS -p tcp --dport 443 --syn -m hashlimit --hashlimit-name syn
 iptables -A ANTI_DDOS -p icmp --icmp-type echo-request -m limit --limit 2/s --limit-burst 4 -j RETURN
 iptables -A ANTI_DDOS -p icmp --icmp-type echo-request -j DROP
 
-# RTMP: máx 50 conexiones por IP
-iptables -A ANTI_DDOS -p tcp --dport 1935 -m connlimit --connlimit-above 50 -j DROP
+# RTMP: whitelist srs-ingest (141.94.207.173) - sin límite de conexiones
+iptables -A ANTI_DDOS -p tcp --dport 1935 -s 141.94.207.173 -j RETURN
+
+# RTMP: whitelist srs-thumbnail (51.210.109.197)
+iptables -A ANTI_DDOS -p tcp --dport 1935 -s 51.210.109.197 -j RETURN
+
+# RTMP: máx 10 conexiones por IP para el resto (publishers externos)
+iptables -A ANTI_DDOS -p tcp --dport 1935 -m connlimit --connlimit-above 10 -j DROP
 
 # API SRS: solo localhost
 iptables -A ANTI_DDOS -p tcp --dport 1985 ! -s 127.0.0.1 -j DROP
@@ -94,8 +100,8 @@ echo "  OK"
 echo ""
 echo "=== LISTO ==="
 echo "  - sysctl: SYN cookies, anti-spoofing, tuning de conexiones"
-echo "  - iptables: SYN/ICMP flood, RTMP max 5 conn/IP"
-echo "  - Puertos 1985 y 8080 bloqueados desde exterior"
+echo "  - iptables: SYN/ICMP flood, RTMP whitelist ingest+thumbnail, max 10 conn/IP resto"
+echo "  - Puerto 1985 bloqueado desde exterior"
 echo ""
 echo "  Ver reglas:  iptables -L ANTI_DDOS -v -n"
 echo "  Revertir:    bash anti-ddos.sh --revert"
