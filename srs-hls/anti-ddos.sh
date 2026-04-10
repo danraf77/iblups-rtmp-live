@@ -1,11 +1,14 @@
 #!/bin/bash
 # =============================================================
-# Anti-DDoS hardening para VPS SRS-HLS (OVH)
+# Anti-DDoS hardening para VPS SRS-HLS (37.59.97.144)
 # Ejecutar como root: bash anti-ddos.sh
 # Revertir:           bash anti-ddos.sh --revert
 # =============================================================
 
 set -e
+
+# --- Servidor de confianza (único permitido en RTMP) ---
+SRS_INGEST="141.94.207.173"
 
 # --- REVERTIR ---
 if [ "$1" = "--revert" ]; then
@@ -55,34 +58,30 @@ iptables -X ANTI_DDOS 2>/dev/null || true
 
 iptables -N ANTI_DDOS
 
-# Drop paquetes inválidos
+# --- Whitelist: servidores de confianza (sin límite) ---
+iptables -A ANTI_DDOS -s $SRS_INGEST -j RETURN
+iptables -A ANTI_DDOS -s 127.0.0.1 -j RETURN
+
+# --- Drop paquetes inválidos ---
 iptables -A ANTI_DDOS -m state --state INVALID -j DROP
 
-# SYN flood por IP: máx 30 conexiones nuevas/seg por IP (un viewer normal usa ~1/seg)
+# --- SYN flood en puertos HTTP/HTTPS ---
 iptables -A ANTI_DDOS -p tcp --dport 80 --syn -m hashlimit --hashlimit-name syn80 \
     --hashlimit-above 30/s --hashlimit-burst 50 --hashlimit-mode srcip --hashlimit-htable-expire 30000 -j DROP
 iptables -A ANTI_DDOS -p tcp --dport 443 --syn -m hashlimit --hashlimit-name syn443 \
     --hashlimit-above 30/s --hashlimit-burst 50 --hashlimit-mode srcip --hashlimit-htable-expire 30000 -j DROP
 
-# ICMP flood
+# --- ICMP flood ---
 iptables -A ANTI_DDOS -p icmp --icmp-type echo-request -m limit --limit 2/s --limit-burst 4 -j RETURN
 iptables -A ANTI_DDOS -p icmp --icmp-type echo-request -j DROP
 
-# RTMP: whitelist srs-ingest (141.94.207.173) - sin límite de conexiones
-iptables -A ANTI_DDOS -p tcp --dport 1935 -s 141.94.207.173 -j RETURN
+# --- RTMP: solo srs-ingest, bloquear todo el resto ---
+iptables -A ANTI_DDOS -p tcp --dport 1935 -j DROP
 
-# RTMP: whitelist srs-thumbnail (51.210.109.197)
-iptables -A ANTI_DDOS -p tcp --dport 1935 -s 51.210.109.197 -j RETURN
+# --- API SRS: solo localhost (ya whitelisted arriba) ---
+iptables -A ANTI_DDOS -p tcp --dport 1985 -j DROP
 
-# RTMP: máx 10 conexiones por IP para el resto (publishers externos)
-iptables -A ANTI_DDOS -p tcp --dport 1935 -m connlimit --connlimit-above 10 -j DROP
-
-# API SRS: solo localhost
-iptables -A ANTI_DDOS -p tcp --dport 1985 ! -s 127.0.0.1 -j DROP
-
-# SRS HTTP directo: abierto al exterior (consola SRS en puerto 8080)
-# iptables -A ANTI_DDOS -p tcp --dport 8080 ! -s 127.0.0.1 -j DROP
-
+# --- Insertar cadena en INPUT ---
 iptables -I INPUT -j ANTI_DDOS
 echo "  OK"
 
@@ -99,9 +98,11 @@ echo "  OK"
 
 echo ""
 echo "=== LISTO ==="
-echo "  - sysctl: SYN cookies, anti-spoofing, tuning de conexiones"
-echo "  - iptables: SYN/ICMP flood, RTMP whitelist ingest+thumbnail, max 10 conn/IP resto"
-echo "  - Puerto 1985 bloqueado desde exterior"
+echo "  - Whitelist: $SRS_INGEST (ingest), localhost"
+echo "  - SYN/ICMP flood protection en HTTP/HTTPS"
+echo "  - RTMP: solo $SRS_INGEST permitido, resto bloqueado"
+echo "  - Puerto 1985 solo accesible desde localhost e ingest"
+echo "  - Puerto 8080 abierto (consola SRS)"
 echo ""
 echo "  Ver reglas:  iptables -L ANTI_DDOS -v -n"
 echo "  Revertir:    bash anti-ddos.sh --revert"
