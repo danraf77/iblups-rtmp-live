@@ -74,8 +74,8 @@ iptables -A ANTI_DDOS -p tcp --dport 1935 -m connlimit --connlimit-above 5 -j DR
 # API SRS: solo localhost
 iptables -A ANTI_DDOS -p tcp --dport 1985 ! -s 127.0.0.1 -j DROP
 
-# SRS HTTP directo: solo localhost (Nginx sirve al exterior)
-iptables -A ANTI_DDOS -p tcp --dport 8080 ! -s 127.0.0.1 -j DROP
+# SRS HTTP directo: abierto al exterior (consola SRS en puerto 8080)
+# iptables -A ANTI_DDOS -p tcp --dport 8080 ! -s 127.0.0.1 -j DROP
 
 iptables -I INPUT -j ANTI_DDOS
 echo "  OK"
