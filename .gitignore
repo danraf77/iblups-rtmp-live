@@ -21,4 +21,5 @@ backend-go/iblups-ingest
 .agents
 skills-lock.json
 .venv_pdf
+/hls-irtp
 
