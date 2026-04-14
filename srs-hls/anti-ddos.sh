@@ -46,13 +46,13 @@ iptables -A ANTI_DDOS -p tcp --dport 1985 -j DROP
 # --- HLS: limitar requests abusivos por IP ---
 # .m3u8 se pide cada 2-4 seg por viewer, 30/s por IP es generoso
 iptables -A ANTI_DDOS -p tcp --dport 80 --syn -m hashlimit --hashlimit-name hls80 \
-    --hashlimit-above 30/s --hashlimit-burst 60 --hashlimit-mode srcip --hashlimit-htable-expire 30000 -j DROP
+    --hashlimit-above 15/s --hashlimit-burst 30 --hashlimit-mode srcip --hashlimit-htable-expire 30000 -j DROP
 iptables -A ANTI_DDOS -p tcp --dport 443 --syn -m hashlimit --hashlimit-name hls443 \
-    --hashlimit-above 30/s --hashlimit-burst 60 --hashlimit-mode srcip --hashlimit-htable-expire 30000 -j DROP
+    --hashlimit-above 15/s --hashlimit-burst 30 --hashlimit-mode srcip --hashlimit-htable-expire 30000 -j DROP
 
 # --- Limitar conexiones simultáneas por IP en HLS ---
-iptables -A ANTI_DDOS -p tcp --dport 80 -m connlimit --connlimit-above 100 -j DROP
-iptables -A ANTI_DDOS -p tcp --dport 443 -m connlimit --connlimit-above 100 -j DROP
+iptables -A ANTI_DDOS -p tcp --dport 80 -m connlimit --connlimit-above 50 -j DROP
+iptables -A ANTI_DDOS -p tcp --dport 443 -m connlimit --connlimit-above 50 -j DROP
 
 # --- Insertar cadena en INPUT ---
 iptables -I INPUT -j ANTI_DDOS
